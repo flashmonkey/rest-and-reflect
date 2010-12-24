@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2010 Quick TV -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.flashmonkey</groupId>
+	<artifactId>as3-restful-signals</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>swc</packaging>
+	<name>Rest And Reflect</name>
+
+	<properties>
+		<flex.sdk.version>4.1.0.16248</flex.sdk.version>
+		<target.player.version>10.0.0</target.player.version>
+		<config.debug>true</config.debug>
+	</properties>
+
+	<build>
+		<sourceDirectory>src/main/actionscript</sourceDirectory>
+
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.flexmojos</groupId>
+				<artifactId>flexmojos-maven-plugin</artifactId>
+				<version>4.0-beta-3</version>
+				<extensions>true</extensions>
+				<dependencies>
+					<dependency>
+						<groupId>com.adobe.flex</groupId>
+						<artifactId>compiler</artifactId>
+						<version>${flex.sdk.version}</version>
+						<type>pom</type>
+					</dependency>
+					<dependency>
+						<groupId>com.adobe.flex.compiler</groupId>
+						<artifactId>asdoc</artifactId>
+						<version>${flex.sdk.version}</version>
+						<classifier>template</classifier>
+						<type>zip</type>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<allowSourcePathOverlap>true</allowSourcePathOverlap>
+					<sourcePaths>
+						<path>${project.basedir}/src/main/actionscript/</path>
+					</sourcePaths>
+					<configurationReport>true</configurationReport>
+					<debug>${config.debug}</debug>
+					<targetPlayer>${target.player.version}</targetPlayer>
+					<locales>
+						<param>en_US</param>
+					</locales>
+					<updateSecuritySandbox>true</updateSecuritySandbox>
+					<includeAsClasses>
+						<source>
+							<directory>src/main/actionscript</directory>
+						</source>
+					</includeAsClasses>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>flashmonkey-forge</id>
+			<url>http://50.16.248.171:8081/nexus</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>forge</id>
+			<url>http://repository.sonatype.org/content/groups/flexgroup</url>
+			<name>Maven Plugin Repository</name>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.adobe.flex.framework</groupId>
+			<artifactId>flex-framework</artifactId>
+			<version>${flex.sdk.version}</version>
+			<type>pom</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osflash</groupId>
+			<artifactId>as3-signals</artifactId>
+			<version>0.7</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.robotlegs</groupId>
+			<artifactId>signals-extension-SignalsCommandMap</artifactId>
+			<version>0.2</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.robotlegs</groupId>
+			<artifactId>robotlegs-framework</artifactId>
+			<version>1.0.3</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.as3commons</groupId>
+			<artifactId>as3-commons-lang</artifactId>
+			<version>0.3</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.as3commons</groupId>
+			<artifactId>as3commons-reflect</artifactId>
+			<version>1.3.3.1</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.as3commons</groupId>
+			<artifactId>as3-commons-logging</artifactId>
+			<version>1.3</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.as3commons</groupId>
+			<artifactId>as3-commons-collections</artifactId>
+			<version>1.0.0</version>
+			<type>swc</type>
+			<scope>compile</scope>
+		</dependency>
+
+	</dependencies>
+
+</project>
