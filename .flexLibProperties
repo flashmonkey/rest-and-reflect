@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<flexLibProperties includeAllClasses="true" version="3">
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
+    <classEntry path="org.flashmonkey.mvcs.controller.command.RestModelAwareCommand"/>
     <classEntry path="org.flashmonkey.mvcs.controller.command.ShowCommand"/>
     <classEntry path="org.flashmonkey.mvcs.controller.signal.Show"/>
     <classEntry path="org.flashmonkey.mvcs.model.Format"/>
+    <classEntry path="org.flashmonkey.mvcs.model.IModel"/>
     <classEntry path="org.flashmonkey.mvcs.model.IRailsModel"/>
     <classEntry path="org.flashmonkey.mvcs.model.IRestModel"/>
     <classEntry path="org.flashmonkey.mvcs.model.IRestful"/>
+    <classEntry path="org.flashmonkey.mvcs.model.ISignalBus"/>
+    <classEntry path="org.flashmonkey.mvcs.model.Model"/>
+    <classEntry path="org.flashmonkey.mvcs.model.Noun"/>
     <classEntry path="org.flashmonkey.mvcs.model.RailsModel"/>
     <classEntry path="org.flashmonkey.mvcs.model.RestModel"/>
-    <classEntry path="org.flashmonkey.mvcs.model.Verb"/>
-    <classEntry path="org.flashmonkey.mvcs.service.rest.ShowOperation"/>
-    <classEntry path="org.flashmonkey.mvcs.service.write.WriteXMLOperation"/>
-    <classEntry path="org.flashmonkey.mvcs.service.write.WriteToXMLOperationTest"/>
-    <classEntry path="org.flashmonkey.mvcs.model.ISignalBus"/>
-    <classEntry path="org.flashmonkey.mvcs.model.IModel"/>
-    <classEntry path="org.flashmonkey.mvcs.model.Model"/>
     <classEntry path="org.flashmonkey.mvcs.model.SignalBus"/>
-    <classEntry path="org.flashmonkey.mvcs.model.Noun"/>
+    <classEntry path="org.flashmonkey.mvcs.model.Verb"/>
+    <classEntry path="org.flashmonkey.mvcs.service.read.AbstractJSONReader"/>
+    <classEntry path="org.flashmonkey.mvcs.service.read.ReadJSONOperation"/>
     <classEntry path="org.flashmonkey.mvcs.service.read.ReadXMLOperation"/>
-    <classEntry path="org.flashmonkey.mvcs.controller.command.RestModelAwareCommand"/>
-    <classEntry path="org.flashmonkey.mvcs.view.RestMediator"/>
-    <classEntry path="org.flashmonkey.mvcs.view.IRestList"/>
-    <classEntry path="org.flashmonkey.mvcs.view.RestListMediator"/>
-    <classEntry path="org.flashmonkey.mvcs.view.IRestView"/>
-    <classEntry path="org.flashmonkey.mvcs.view.AbstractRestPanel"/>
-    <classEntry path="org.flashmonkey.mvcs.view.AbstractRestList"/>
-    <classEntry path="org.flashmonkey.mvcs.service.write.AbstractObjectWriteOperation"/>
-    <classEntry path="org.flashmonkey.mvcs.service.write.WriteURLVariablesOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.service.rest.ShowOperation"/>
     <classEntry path="org.flashmonkey.mvcs.service.rest.UploadOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.AbstractJSONWriteOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.AbstractObjectWriteOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.WriteJSONOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.WriteURLVariablesOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.WriteXMLOperation"/>
+    <classEntry path="org.flashmonkey.mvcs.view.IRestList"/>
+    <classEntry path="org.flashmonkey.mvcs.view.IRestView"/>
+    <classEntry path="org.flashmonkey.mvcs.view.RestListMediator"/>
+    <classEntry path="org.flashmonkey.mvcs.view.RestMediator"/>
+    <classEntry path="org.flashmonkey.util.StringUtils"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.WriteToXMLOperationTest"/>
+    <classEntry path="org.flashmonkey.mvcs.service.rest.ServiceContext"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.IRestPropertyWriter"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.ListRestPropertyWriter"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

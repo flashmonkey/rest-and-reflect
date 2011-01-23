@@ -8,12 +8,21 @@ package org.flashmonkey.mvcs.service.write
 	import org.as3commons.reflect.Type;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
+	import org.flashmonkey.mvcs.service.IRestService;
+	import org.flashmonkey.mvcs.service.rest.ServiceContext;
 	
 	public class WriteURLVariablesOperation extends AbstractObjectWriteOperation
 	{
-		public function WriteURLVariablesOperation(source:*, verb:Verb)
+		private var _includes:Array = [];
+		
+		private var _excludes:Array = ["prototype"];
+		
+		public function WriteURLVariablesOperation(service:IRestService, source:*, verb:Verb, serviceContext:ServiceContext)
 		{
-			super(source, verb);
+			super(service, source, verb);
+
+			_includes = _includes.concat(serviceContext.includes);
+			_excludes = _excludes.concat(serviceContext.excludes);
 		}
 		
 		public override function execute():void
@@ -27,44 +36,49 @@ package org.flashmonkey.mvcs.service.write
 			else
 			{
 				type = Type.forInstance(source);
-				dispatchComplete(writeModel(IRestModel(source), type));
+				dispatchComplete(writeModel(IRestModel(source), type, _includes, _excludes));
 			}
 		}
 		
-		protected function writeModel(model:IRestModel, type:Type):URLVariables 
+		protected function writeModel(model:IRestModel, type:Type, includes:Array, excludes:Array):URLVariables 
 		{
 			var vars:URLVariables = new URLVariables();
 			
-			for each (var extendedClass:String in type.extendsClasses)
+			/*for each (var extendedClass:String in type.extendsClasses)
 			{
 				if (extendedClass != "Object")
 				{
 					writeFields(model, Type.forName(extendedClass).accessors, vars);
 				}
-			}
+			}*/
 			
-			writeFields(model, type.accessors, vars);
-			trace(vars);
+			writeFields(model, type.accessors, vars, includes, excludes);
+
 			return vars;
 		}
 		
-		protected function writeFields(model:IRestModel, accessors:Array, vars:URLVariables):void 
+		protected function writeFields(model:IRestModel, accessors:Array, vars:URLVariables, includes:Array, excludes:Array):void 
 		{
 			for each (var accessor:Accessor in accessors)
 			{
+				trace("attempting to write field '" + accessor.name + "' including " + includes + " excluding " + excludes);
 				if (accessor.isReadable())
 				{
-					var value:* = accessor.getValue(model);
-					
-					if (value != null && !ignoreField(accessor))
+					if (!ignoreField(accessor, includes, excludes))
 					{
-						if (accessor.type.name == "IList")
+						trace("not ignoring " + accessor.name + " writing it");
+						var value:* = accessor.getValue(model);
+						trace("value of '" + accessor.name + "' is '" + value + "'");
+						if (value != null)
 						{
-							
-						}
-						else
-						{
-							writeField(accessor.name, value.toString(), vars);
+							if (accessor.type.name == "IList")
+							{
+								
+							}
+							else
+							{
+								writeField(accessor.name, value.toString(), vars);
+							}
 						}
 					}
 				}
@@ -73,7 +87,6 @@ package org.flashmonkey.mvcs.service.write
 		
 		protected function writeField(name:String, value:String, vars:URLVariables):void 
 		{
-			trace("writing " + name + " => " + value);
 			vars[name] = value;
 		}
 	}

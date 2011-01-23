@@ -7,12 +7,12 @@ package org.flashmonkey.mvcs.service.rest
 	{
 		public override function get url():String
 		{
-			return context + "/" + model.noun + "/" + model.id + ".xml";
+			return context + "/" + model.noun + "/" + model._id + ".xml";
 		}
 		
-		public function ShowOperation(service:IRestService, model:IRestModel)
+		public function ShowOperation(service:IRestService, model:IRestModel, serviceContext:ServiceContext)
 		{
-			super(service, model);
+			super(service, model, serviceContext);
 		}
 	}
 }

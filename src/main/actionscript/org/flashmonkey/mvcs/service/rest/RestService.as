@@ -6,14 +6,19 @@ package org.flashmonkey.mvcs.service.rest
 	import org.as3commons.lang.DictionaryUtils;
 	import org.as3commons.reflect.Accessor;
 	import org.as3commons.reflect.MetaData;
+	import org.as3commons.reflect.MetaDataArgument;
 	import org.as3commons.reflect.Type;
 	import org.flashmonkey.mvcs.model.Format;
+	import org.flashmonkey.mvcs.model.IModel;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
-	import org.flashmonkey.mvcs.service.operation.IOperation;
+	import org.flashmonkey.mvcs.service.read.ReadJSONOperation;
 	import org.flashmonkey.mvcs.service.read.ReadXMLOperation;
+	import org.flashmonkey.mvcs.service.write.WriteJSONOperation;
 	import org.flashmonkey.mvcs.service.write.WriteXMLOperation;
+	import org.flashmonkey.operations.service.IOperation;
+	import org.osmf.layout.AbsoluteLayoutFacet;
 	
 	public class RestService implements IRestService
 	{
@@ -26,6 +31,17 @@ package org.flashmonkey.mvcs.service.rest
 		public function set context(value:String):void
 		{
 			_context = value;
+		}
+		
+		private var _airAvailable:Boolean;
+		
+		public function get airAvailable():Boolean
+		{
+			return _airAvailable;
+		}
+		public function set airAvailable(value:Boolean):void
+		{
+			_airAvailable = value;
 		}
 		
 		private var _urlCache:Dictionary = new Dictionary();
@@ -60,7 +76,7 @@ package org.flashmonkey.mvcs.service.rest
 			return null;
 		}
 		
-		public function create(value:IRestModel):IOperation
+		public function create(value:IRestModel, serviceContext:ServiceContext = null):IOperation
 		{
 			var type:Type = Type.forInstance(value);
 			
@@ -82,17 +98,18 @@ package org.flashmonkey.mvcs.service.rest
 						dataField = "file";
 					}
 					
-					return new UploadOperation(this, value, a, dataField);
+					return new UploadOperation(this, value, a, dataField, serviceContext || new ServiceContext());
 				}
 				
 			}
 			
-			return new CreateOperation(this, value);
+			return new CreateOperation(this, value, serviceContext || new ServiceContext());
 		}
 		
-		public function update(value:IRestModel):IOperation
+		public function update(value:IRestModel, serviceContext:ServiceContext = null):IOperation
 		{
-			return new UpdateOperation(this, value);
+			trace("updating :" + serviceContext);
+			return new UpdateOperation(this, value, serviceContext || new ServiceContext());
 		}
 		
 		public function destroy(value:IRestModel):IOperation
@@ -100,14 +117,69 @@ package org.flashmonkey.mvcs.service.rest
 			return new DestroyOperation(this, value);
 		}
 		
-		public function read(value:*):IOperation
+		public function read(value:*, model:Class = null):IOperation
 		{
-			return new ReadXMLOperation(value as XML);
+			if (model)
+			{
+				var type:Type = Type.forClass(model);
+				
+				trace("type " + type.name + " has parse metadata? " + type.hasMetaData("Parse"));
+				
+				if (type.hasMetaData("Parse"))
+				{
+					var m:MetaData = MetaData(type.getMetaData("Parse")[0]);
+					
+					if (m.hasArgumentWithKey("reader"))
+					{
+						var mArg:MetaDataArgument = m.getArgument("reader");
+						
+						trace("Creating a reader with name :: " + mArg.value);
+						
+						try
+						{
+							var reader:Class = ClassUtils.forName(mArg.value);
+							return ClassUtils.newInstance(reader, [value]);
+						}
+						catch (e:Error)
+						{
+							throw new Error("Problem creating reader class - " + e.message);
+						}
+					}
+				}
+			}
+			
+			return format == Format.XML ? new ReadXMLOperation(new XML(value)) : new ReadJSONOperation(value as String);
 		}
 		
-		public function write(value:IRestModel, verb:Verb):IOperation
+		public function write(value:*, verb:Verb, serviceContext:ServiceContext = null, writeName:Boolean = true):IOperation
 		{
-			return new WriteXMLOperation(value, verb);
+			/*var type:Type = Type.forInstance(value);
+			
+			trace("type " + type.name + " has parse metadata? " + type.hasMetaData("Parse"));
+			
+			if (type.hasMetaData("Parse"))
+			{
+				var m:MetaData = MetaData(type.getMetaData("Parse")[0]);
+				
+				if (m.hasArgumentWithKey("writer"))
+				{
+					var mArg:MetaDataArgument = m.getArgument("writer");
+					
+					trace("Creating a writer with name :: " + mArg.value + " for " + value + ", " + verb);
+					
+					try
+					{
+						var writer:Class = ClassUtils.forName(mArg.value);
+						return ClassUtils.newInstance(writer, [this, value, verb, serviceContext || new ServiceContext(), writeName]);
+					}
+					catch (e:Error)
+					{
+						throw new Error("Problem creating writer class - " + e.message);
+					}
+				}
+			}*/
+			trace("Writing format : " + format); 
+			return format == Format.XML ? new WriteXMLOperation(this, value, verb, serviceContext || new ServiceContext()) : new WriteJSONOperation(this, value, verb, serviceContext || new ServiceContext(), writeName);
 		}
 	}
 }

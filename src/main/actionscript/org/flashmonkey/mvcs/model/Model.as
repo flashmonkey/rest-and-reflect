@@ -15,7 +15,8 @@ package org.flashmonkey.mvcs.model
 		
 		public function set(name:String, value:*):void
 		{
-			trace("Setting " + name + " to " + value);
+			trace("SETTING " + name + " == " + value);
+			
 			if (!$properties.hasKey(name))
 			{
 				$properties.add(name, value);
@@ -24,7 +25,7 @@ package org.flashmonkey.mvcs.model
 			{
 				$properties.replaceFor(name, value);
 			}
-			
+			trace("dispatching: " + name);
 			signalBus.get(name).dispatch(value);
 		}
 		

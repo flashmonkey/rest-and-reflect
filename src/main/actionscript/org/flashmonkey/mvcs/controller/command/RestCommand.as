@@ -1,10 +1,11 @@
 package org.flashmonkey.mvcs.controller.command
 {
 	import mx.controls.Alert;
+	import mx.states.OverrideBase;
 	
 	import org.flashmonkey.mvcs.model.IModel;
 	import org.flashmonkey.mvcs.service.IRestService;
-	import org.flashmonkey.mvcs.service.operation.IOperation;
+	import org.flashmonkey.operations.service.IOperation;
 	import org.robotlegs.mvcs.SignalCommand;
 	
 	public class RestCommand extends SignalCommand
@@ -25,7 +26,10 @@ package org.flashmonkey.mvcs.controller.command
 		
 		protected function onComplete(o:IOperation):void 
 		{
-			service.read(o.result).addCompleteListener(onReadComplete).addErrorListener(onError).execute();
+			if (o.result)
+			{
+				service.read(o.result).addCompleteListener(onReadComplete).addErrorListener(onError).execute();
+			}
 		}
 		
 		protected function onReadComplete(o:IOperation):void 
@@ -33,7 +37,7 @@ package org.flashmonkey.mvcs.controller.command
 			trace("The result is: " + o.result);
 		}
 		
-		public override function execute():void 
+		public override function execute():void
 		{
 			operation.addCompleteListener(onComplete).addErrorListener(onError).execute();
 		}

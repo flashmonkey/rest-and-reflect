@@ -3,7 +3,7 @@
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		xmlns:mx="library://ns.adobe.com/flex/mx" 
 		implements="org.flashmonkey.mvcs.view.IRestList"
-		width="200" height="300">
+		width="400" height="300">
 	
 	<fx:Script>
 		<![CDATA[
@@ -24,11 +24,11 @@
 				return _show || (_show = new Signal(IRestModel));
 			}
 			
-			private var _create:Signal;
+			private var _destroy:Signal;
 			
-			public function get create():Signal
+			public function get destroy():Signal
 			{
-				return _create || (_create = new Signal(IRestModel));
+				return _destroy || (_destroy = new Signal(IRestModel));
 			}
 			
 			private var _update:Signal;
@@ -38,11 +38,11 @@
 				return _update || (_update = new Signal(IRestModel));
 			}
 			
-			private var _delete:Signal;
+			private var _create:Signal;
 			
-			public function get destroy():Signal
+			public function get create():Signal
 			{
-				return _delete || (_delete = new Signal(IRestModel));
+				return _create || (_create = new Signal(IRestModel));
 			}
 			
 			private var _clearDialog:Signal;
@@ -51,7 +51,6 @@
 			{
 				return _clearDialog || (_clearDialog = new Signal());
 			}
-			
 		]]>
 	</fx:Script>
 	

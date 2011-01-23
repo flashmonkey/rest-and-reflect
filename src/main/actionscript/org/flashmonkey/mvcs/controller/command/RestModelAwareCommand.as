@@ -1,9 +1,8 @@
 package org.flashmonkey.mvcs.controller.command
 {
-	import org.as3commons.lang.ClassUtils;
 	import org.flashmonkey.mvcs.controller.signal.Index;
 	import org.flashmonkey.mvcs.model.IRestModel;
-	import org.flashmonkey.mvcs.service.operation.IOperation;
+	import org.flashmonkey.operations.service.IOperation;
 
 	public class RestModelAwareCommand extends RestCommand
 	{
@@ -25,7 +24,12 @@ package org.flashmonkey.mvcs.controller.command
 		
 		protected override function onReadComplete(o:IOperation):void 
 		{	
-			index.dispatch(ClassUtils.forInstance(restModel));
+			reIndex();
+		}
+		
+		protected function reIndex():void 
+		{
+			index.dispatch(restModel.clazz);
 		}
 	}
 }

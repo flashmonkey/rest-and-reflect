@@ -1,5 +1,7 @@
 package org.flashmonkey.mvcs.service.rest
 {
+	import flash.net.URLRequestHeader;
+	
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
@@ -8,17 +10,24 @@ package org.flashmonkey.mvcs.service.rest
 	{
 		public override function get url():String
 		{
-			return context + "/" + model.noun.plural + "/" + model.id + service.format.toString();
+			return context + "/" + model.noun.plural + "/" + model._id + service.format.toString();
 		}
 		
 		public override function get verb():Verb
 		{
+			if (!service.airAvailable)
+			{
+				request.requestHeaders = [new URLRequestHeader("X_HTTP_METHOD_OVERRIDE", "PUT")];
+				
+				return Verb.POST;
+			}
+			
 			return Verb.PUT;
 		}
 		
-		public function UpdateOperation(service:IRestService, model:IRestModel)
+		public function UpdateOperation(service:IRestService, model:IRestModel, serviceContext:ServiceContext)
 		{
-			super(service, model);
+			super(service, model, serviceContext);
 		}
 	}
 }

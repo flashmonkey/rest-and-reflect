@@ -8,7 +8,7 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public override function get url():String
 		{
-			return context + "/" + _url + ".xml";
+			return context + "/" + _url + service.format.toString();
 		}
 		
 		public function IndexOperation(service:IRestService, url:String)

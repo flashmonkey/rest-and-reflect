@@ -1,6 +1,6 @@
 package org.flashmonkey.mvcs.controller.command
 {
-	import org.flashmonkey.mvcs.service.operation.IOperation;
+	import org.flashmonkey.operations.service.IOperation;
 
 	public class ShowCommand extends RestModelAwareCommand
 	{

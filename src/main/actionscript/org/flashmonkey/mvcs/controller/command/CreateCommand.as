@@ -1,7 +1,6 @@
 package org.flashmonkey.mvcs.controller.command
 {
-	import org.flashmonkey.mvcs.model.Verb;
-	import org.flashmonkey.mvcs.service.operation.IOperation;
+	import org.flashmonkey.operations.service.IOperation;
 	
 	public class CreateCommand extends RestModelAwareCommand
 	{

@@ -1,22 +1,19 @@
 package org.flashmonkey.mvcs.service.rest
 {
-	import flash.events.DataEvent;
 	import flash.events.Event;
-	import flash.events.HTTPStatusEvent;
 	import flash.events.IOErrorEvent;
 	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
-	import flash.net.URLVariables;
 	
 	import org.as3commons.reflect.Field;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
-	import org.flashmonkey.mvcs.service.operation.IOperation;
 	import org.flashmonkey.mvcs.service.write.WriteURLVariablesOperation;
+	import org.flashmonkey.operations.service.IOperation;
 	
 	public class UploadOperation extends RestModelAwareOperation
 	{
@@ -31,12 +28,12 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public override function get url():String
 		{
-			return context + "/" + model.noun.plural + "/upload" + service.format.toString();
+			return context + "/" + model.noun.plural + service.format.toString();
 		}
 		
-		public function UploadOperation(service:IRestService, model:IRestModel, uploadField:Field, dataFieldName:String)
+		public function UploadOperation(service:IRestService, model:IRestModel, uploadField:Field, dataFieldName:String, serviceContext:ServiceContext)
 		{
-			super(service, model);
+			super(service, model, serviceContext);
 			
 			_uploadField = uploadField;
 			_dataFieldName = dataFieldName;
@@ -44,11 +41,12 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public override function execute():void
 		{
-			new WriteURLVariablesOperation(model, verb).addCompleteListener(onURLVarsWritten).execute();
+			new WriteURLVariablesOperation(service, model, verb, serviceContext).addCompleteListener(onURLVarsWritten).execute();
 
 		}
 		
 		private function onURLVarsWritten(o:IOperation):void 
+		//public override function execute():void
 		{
 			var file:FileReference = FileReference(_uploadField.getValue(model));
 					

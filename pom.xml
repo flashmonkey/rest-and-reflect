@@ -6,14 +6,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.flashmonkey</groupId>
-	<artifactId>as3-restful-signals</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<artifactId>rest-and-reflect</artifactId>
+	<version>1.0.2</version>
 	<packaging>swc</packaging>
 	<name>Rest And Reflect</name>
 
 	<properties>
 		<flex.sdk.version>4.1.0.16248</flex.sdk.version>
-		<target.player.version>10.0.0</target.player.version>
+		<target.player.version>10.1.0</target.player.version>
+		<playerglobal.version>10.1</playerglobal.version>
 		<config.debug>true</config.debug>
 	</properties>
 
@@ -24,7 +25,7 @@
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
-				<version>4.0-beta-3</version>
+				<version>4.0-beta-2</version>
 				<extensions>true</extensions>
 				<dependencies>
 					<dependency>
@@ -42,7 +43,9 @@
 					</dependency>
 				</dependencies>
 				<configuration>
+					<ignoreVersionIssues>true</ignoreVersionIssues>
 					<allowSourcePathOverlap>true</allowSourcePathOverlap>
+					<ditaSkip>true</ditaSkip>
 					<sourcePaths>
 						<path>${project.basedir}/src/main/actionscript/</path>
 					</sourcePaths>
@@ -60,13 +63,45 @@
 					</includeAsClasses>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>/Users/admin/Documents/projects/as3commons/as3-commons-lang/src/main/actionscript</source>
+								<source>/Users/admin/Documents/projects/as3commons/as3-commons-collections/src/main/actionscript</source>
+								<source>/Users/admin/Documents/projects/as3commons/as3-commons-logging/src/main/actionscript</source>
+								<source>/Users/admin/Documents/projects/as3commons/as3-commons-reflect/src/main/actionscript</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 	<repositories>
 		<repository>
 			<id>flashmonkey-forge</id>
-			<url>http://50.16.248.171:8081/nexus</url>
+			<url>http://50.16.234.58:8081/nexus/content/repositories/releases/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>sonatype</id>
+			<url>http://50.16.234.58:8081/nexus/content/repositories/sonatype</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -101,59 +136,47 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.adobe.flex.framework</groupId>
+			<artifactId>playerglobal</artifactId>
+			<version>${flex.sdk.version}</version>
+			<scope>external</scope>
+			<type>swc</type>
+			<classifier>${playerglobal.version}</classifier>
+		</dependency>
+
+		<dependency>
 			<groupId>org.osflash</groupId>
 			<artifactId>as3-signals</artifactId>
-			<version>0.7</version>
+			<version>0.8</version>
 			<type>swc</type>
-			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.robotlegs</groupId>
-			<artifactId>signals-extension-SignalsCommandMap</artifactId>
-			<version>0.2</version>
+			<artifactId>signals-extension-signalsCommandMap</artifactId>
+			<version>0.3</version>
 			<type>swc</type>
-			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.robotlegs</groupId>
 			<artifactId>robotlegs-framework</artifactId>
-			<version>1.0.3</version>
+			<version>1.4.0</version>
 			<type>swc</type>
-			<scope>compile</scope>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>org.as3commons</groupId>
-			<artifactId>as3-commons-lang</artifactId>
-			<version>0.3</version>
+			<groupId>org.flashmonkey</groupId>
+			<artifactId>operations-lib</artifactId>
+			<version>1.1</version>
 			<type>swc</type>
-			<scope>compile</scope>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>org.as3commons</groupId>
-			<artifactId>as3commons-reflect</artifactId>
-			<version>1.3.3.1</version>
+			<groupId>com.adobe</groupId>
+			<artifactId>as3corelib</artifactId>
+			<version>0.93</version>
 			<type>swc</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.as3commons</groupId>
-			<artifactId>as3-commons-logging</artifactId>
-			<version>1.3</version>
-			<type>swc</type>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.as3commons</groupId>
-			<artifactId>as3-commons-collections</artifactId>
-			<version>1.0.0</version>
-			<type>swc</type>
-			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

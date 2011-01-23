@@ -4,11 +4,13 @@ package org.flashmonkey.mvcs.service.rest
 	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.net.URLRequestHeader;
 	import flash.net.URLVariables;
 	
+	import org.flashmonkey.mvcs.model.Format;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
-	import org.flashmonkey.mvcs.service.operation.AbstractOperation;
+	import org.flashmonkey.operations.service.AbstractOperation;
 	
 	public class RestOperation extends AbstractOperation
 	{		
@@ -57,7 +59,7 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public function get contentType():String 
 		{
-			return "application/xml";
+			return service.format == Format.XML ? "application/xml" : "application/json";
 		}
 		
 		public function get verb():Verb
@@ -94,7 +96,7 @@ package org.flashmonkey.mvcs.service.rest
 		
 		protected function onLoaderComplete(e:Event):void
 		{
-			dispatchComplete(new XML(_loader.data));
+			dispatchComplete(_loader.data);
 		}
 		
 		protected function onLoaderError(e:IOErrorEvent):void

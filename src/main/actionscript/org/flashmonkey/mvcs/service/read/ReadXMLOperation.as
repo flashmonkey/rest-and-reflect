@@ -3,10 +3,9 @@ package org.flashmonkey.mvcs.service.read
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
-	import org.as3commons.lang.ClassUtils;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Noun;
-	import org.flashmonkey.mvcs.service.operation.AbstractOperation;
+	import org.flashmonkey.operations.service.AbstractOperation;
 	
 	public class ReadXMLOperation extends AbstractOperation
 	{
@@ -21,8 +20,6 @@ package org.flashmonkey.mvcs.service.read
 		
 		public override function execute():void
 		{
-			trace("READING:\n" + _source);
-			
 			if (_source)
 			{
 				if (_source.@type == "array")
@@ -54,7 +51,24 @@ package org.flashmonkey.mvcs.service.read
 		{
 			for each (var property:XML in properties)
 			{
-				model[property.name()] = property.toString();
+				if (property.@type == "array")
+				{
+					if (property.toString() != null)
+					{
+						var list:IList = new ArrayCollection();
+						
+						for each (var listEntry:XML in property.children())
+						{
+							list.addItem(parseModel(Noun.newInstance(property.name()), listEntry.children())); 
+						}
+						
+						model[property.name()] = list;
+					}
+				}
+				else
+				{
+					model[property.name()] = property.toString();
+				}
 			}
 			
 			return model;
