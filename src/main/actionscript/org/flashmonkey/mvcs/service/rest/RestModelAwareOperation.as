@@ -13,11 +13,11 @@ package org.flashmonkey.mvcs.service.rest
 			return _model;
 		}
 		
-		private var _serviceContext:ServiceContext;
+		private var _writeContext:WriteContext;
 		
-		protected function get serviceContext():ServiceContext
+		protected function get writeContext():WriteContext
 		{
-			return _serviceContext;
+			return _writeContext;
 		}
 		
 		public override function get url():String
@@ -25,17 +25,17 @@ package org.flashmonkey.mvcs.service.rest
 			return context + "/" + _model.noun.plural + service.format.toString();
 		}
 		
-		public function RestModelAwareOperation(service:IRestService, model:IRestModel, serviceContext:ServiceContext)
+		public function RestModelAwareOperation(service:IRestService, model:IRestModel, writeContext:WriteContext)
 		{
 			super(service);
 			
 			_model = model;
-			_serviceContext = serviceContext;
+			_writeContext = writeContext;
 		}
 		
 		public override function execute():void
 		{
-			service.write(_model, verb, _serviceContext).addCompleteListener(onWriteComplete).execute();
+			service.write(_model, verb, _writeContext).addCompleteListener(onWriteComplete).execute();
 		}
 		
 		private function onWriteComplete(o:IOperation):void 

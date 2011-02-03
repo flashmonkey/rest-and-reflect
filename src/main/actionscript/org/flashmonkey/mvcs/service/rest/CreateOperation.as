@@ -11,9 +11,9 @@ package org.flashmonkey.mvcs.service.rest
 			return Verb.POST;
 		}
 		
-		public function CreateOperation(service:IRestService, model:IRestModel, serviceContext:ServiceContext)
+		public function CreateOperation(service:IRestService, model:IRestModel, writeContext:WriteContext)
 		{
-			super(service, model, serviceContext);
+			super(service, model, writeContext);
 		}
 	}
 }

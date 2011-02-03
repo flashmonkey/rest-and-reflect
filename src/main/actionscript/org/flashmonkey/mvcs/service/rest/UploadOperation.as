@@ -2,7 +2,6 @@ package org.flashmonkey.mvcs.service.rest
 {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
@@ -31,9 +30,9 @@ package org.flashmonkey.mvcs.service.rest
 			return context + "/" + model.noun.plural + service.format.toString();
 		}
 		
-		public function UploadOperation(service:IRestService, model:IRestModel, uploadField:Field, dataFieldName:String, serviceContext:ServiceContext)
+		public function UploadOperation(service:IRestService, model:IRestModel, uploadField:Field, dataFieldName:String, writeContext:WriteContext)
 		{
-			super(service, model, serviceContext);
+			super(service, model, writeContext);
 			
 			_uploadField = uploadField;
 			_dataFieldName = dataFieldName;
@@ -41,46 +40,53 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public override function execute():void
 		{
-			new WriteURLVariablesOperation(service, model, verb, serviceContext).addCompleteListener(onURLVarsWritten).execute();
+			new WriteURLVariablesOperation(service, model, verb, writeContext).addCompleteListener(onURLVarsWritten).execute();
 
 		}
 		
 		private function onURLVarsWritten(o:IOperation):void 
 		//public override function execute():void
 		{
-			var file:FileReference = FileReference(_uploadField.getValue(model));
-					
 			var request:URLRequest = new URLRequest(url);
 			request.method = URLRequestMethod.POST;
+			
+			trace("Adding the following data to the upload\n" + o.result);
 			
 			request.data = o.result;
 			
 			var uploadDataFieldName:String = model.noun.singular + '[' + _dataFieldName + ']';
 			
-			file.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(e:SecurityErrorEvent):void {
-				file.cancel();
-				dispatchError(e.text);
-			}, false, 0, true);
+			file.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityError, false, 0, true);
+			file.addEventListener(Event.COMPLETE, onUploadComplete, false, 0, true);
+			file.addEventListener(IOErrorEvent.IO_ERROR, onIOError, false, 0, true);
 			
-			file.addEventListener(Event.COMPLETE, function(e:Event):void {
-				dispatchComplete();
-			}, false, 0, true);
-			
-			/*file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, function(e:Event):void {
-				trace("Data Upload Complete");
-				dispatchComplete();
+			/*file.addEventListener(ProgressEvent.PROGRESS, function(e:ProgressEvent):void {
+				//_model.progress = e.bytesLoaded / e.bytesTotal;
 			});*/
 			
-			file.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):void {
-				file.cancel();
-				dispatchError(e.text);
-			}, false, 0, true);
-			
-			file.addEventListener(ProgressEvent.PROGRESS, function(e:ProgressEvent):void {
-				//_model.progress = e.bytesLoaded / e.bytesTotal;
-			});
-			
 			file.upload(request, uploadDataFieldName);
+		}
+		
+		private function onSecurityError(e:SecurityErrorEvent):void 
+		{
+			file.cancel();
+			dispatchError(e.text);
+		}	
+		
+		private function onUploadComplete(e:Event):void 
+		{
+			dispatchComplete();
+		}
+		
+		private function onIOError(e:IOErrorEvent):void 
+		{
+			file.cancel();
+			dispatchError(e.text);
+		}
+		
+		private function get file():FileReference
+		{
+			return FileReference(_uploadField.getValue(model));
 		}
 	}
 }

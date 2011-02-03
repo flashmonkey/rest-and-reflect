@@ -26,28 +26,6 @@ package org.flashmonkey.mvcs.service.read
 		/** The current token from the tokenizer */
 		private var token:JSONToken;
 		
-		private var _key:String;
-		
-		protected function get key():String 
-		{
-			return _key;
-		}
-		protected function set key(value:String):void 
-		{
-			_key = value;
-		}
-		
-		private var _arrayKey:String;
-		
-		protected function get arrayKey():String
-		{
-			return _arrayKey;
-		}
-		protected function set arrayKey(value:String):void 
-		{
-			_arrayKey = value;
-		}
-		
 		public function AbstractJSONReader(source:String)
 		{
 			super();
@@ -68,7 +46,6 @@ package org.flashmonkey.mvcs.service.read
 			
 			dispatchComplete(getValue());
 		}
-		
 		/**
 		 * Gets the internal object that was created by parsing
 		 * the JSON string passed to the constructor.
@@ -120,13 +97,11 @@ package org.flashmonkey.mvcs.service.read
 		/**
 		 * Attempt to parse an array.
 		 */
-		protected final function parseArray():IList
+		private final function parseArray():Array
 		{
-			arrayKey = key;
-			
 			// create an array internally that we're going to attempt
 			// to parse from the tokenizer
-			var a:IList = new ArrayCollection();
+			var a:Array = new Array();
 			
 			// grab the next token from the tokenizer to move
 			// past the opening [
@@ -161,7 +136,7 @@ package org.flashmonkey.mvcs.service.read
 			while ( true )
 			{
 				// read in the value and add it to the array
-				a.addItem( parseValue() );
+				a.push( parseValue() );
 				
 				// after the value there should be a ] or a ,
 				nextValidToken();
@@ -205,11 +180,11 @@ package org.flashmonkey.mvcs.service.read
 		{
 			// create the object internally that we're going to
 			// attempt to parse from the tokenizer
-			var o:Object = newObject();
+			var o:Object = new Object();
 			
 			// store the string part of an object member so
 			// that we can assign it a value in the object
-			//var key:String
+			var key:String
 			
 			// grab the next token from the tokenizer
 			nextValidToken();
@@ -255,8 +230,7 @@ package org.flashmonkey.mvcs.service.read
 					{
 						// move past the : and read/assign a value for the key
 						nextToken();
-						//o[ key ] = parseValue();
-						applyPropertyValue(o, key, parseValue());
+						o[ key ] = parseValue();
 						
 						// move past the value to see what's next
 						nextValidToken();
@@ -303,11 +277,6 @@ package org.flashmonkey.mvcs.service.read
 			return null;
 		}
 		
-		protected function applyPropertyValue(o:Object, key:String, value:Object):void
-		{
-			o[ key ] = value;
-		}
-		
 		/**
 		 * Attempt to parse a value
 		 */
@@ -345,11 +314,6 @@ package org.flashmonkey.mvcs.service.read
 					
 			}
 			
-			return null;
-		}		
-		
-		protected function newObject():*
-		{
 			return null;
 		}
 	}

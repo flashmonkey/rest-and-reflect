@@ -1,11 +1,23 @@
 package org.flashmonkey.mvcs.service.write
 {
+	import flash.net.URLVariables;
+	
+	import org.as3commons.lang.ClassUtils;
 	import org.as3commons.reflect.Accessor;
+	import org.as3commons.reflect.MetaData;
+	import org.as3commons.reflect.MetaDataArgument;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 
 	public class RestPropertyWriter implements IRestPropertyWriter
 	{
+		private var _writeSuffix:String = "";
+		
+		public function set writeSuffix(suffix:String):void
+		{
+			_writeSuffix = suffix;
+		}
+		
 		private var _accessor:Accessor;
 		
 		protected function get accessor():Accessor
@@ -27,78 +39,104 @@ package org.flashmonkey.mvcs.service.write
 			return _verb;
 		}
 		
-		private var _includes:Array;
-		
-		protected function get includes():Array 
-		{
-			return _includes;
-		}
-		
-		private var _excludes:Array;
-		
-		protected function get excludes():Array
-		{
-			return _excludes;
-		}
-		
-		public function RestPropertyWriter(accessor:Accessor, object:IRestModel, verb:Verb, includes:Array = null, excludes:Array = null)
+		public function RestPropertyWriter(accessor:Accessor, object:IRestModel, verb:Verb)
 		{
 			_accessor = accessor;
 			_object = object;
 			_verb = verb;
-			_includes = includes || [];
-			_excludes = excludes || [];
 		}
 		
-		protected var _json:String;
-		
-		public function get json():String
+		public function writeJson(includes:Array, excludes:Array):String
 		{
 			return null;
 		}
 		
-		protected var _xml:XML;
-		
-		public function get xml():XML
+		public function writeXml(includes:Array, excludes:Array):XML
 		{
 			return null;
 		}
 		
-		public function get can():Boolean
+		public function canWrite(includes:Array, excludes:Array):Boolean
 		{
-			return !ignoreField(accessor, includes, excludes);
+			return accessor.getValue(object) != null && !ignoreField(includes, excludes);
 		}
 		
-		public static function writerFor(accessor:Accessor, object:IRestModel, verb:Verb, includes:Array, excludes:Array):IRestPropertyWriter
+		public static function writerFor(accessor:Accessor, object:IRestModel, verb:Verb):IRestPropertyWriter
+		{
+			if (accessor.hasMetaData("Rest"))
+			{
+				var m:MetaData = accessor.getMetaData("Rest")[0];
+				
+				var writer:IRestPropertyWriter
+				
+				if (m.hasArgumentWithKey("writer"))
+				{
+					var writerName:String = m.getArgument("writer").value;
+	
+					writer = ClassUtils.newInstance(ClassUtils.forName(writerName),[accessor, object, verb]);
+	
+					return writer;
+				}
+				else
+				{
+					if (m.hasArgumentWithKey("writeSuffix"))
+					{
+						writer = defaultWriterFor(accessor, object, verb);
+						writer.writeSuffix = m.getArgument("writeSuffix").value;
+						
+						return writer;
+					}
+				}
+			}
+			
+			return defaultWriterFor(accessor, object, verb);
+		}
+		
+		private static function defaultWriterFor(accessor:Accessor, object:IRestModel, verb:Verb):IRestPropertyWriter
 		{
 			switch (accessor.type.name)
 			{
 				case "String":
 				case "Number":
 				case "int":
-					return new PrimitiveRestPropertyWriter(accessor, object, verb, includes, excludes);
+				case "Boolean":
+					return new PrimitiveRestPropertyWriter(accessor, object, verb);
 					
 				case "IList":
-					return new ListRestPropertyWriter(accessor object, verb, includes, excludes);
+					return new ListRestPropertyWriter(accessor, object, verb);
+					
+				case "Object":
+				case "ObjectProxy":
+					return new ObjectRestPropertyWriter(accessor, object, verb);
 					
 				default:
-					return null;
+					return new RestModelPropertyWriter(accessor, object, verb);
 			}
 		}
 		
-		private function ignoreField(accessor:Accessor, includes:Array, excludes:Array):Boolean
+		protected function ignoreField(includes:Array, excludes:Array):Boolean
 		{
 			if (includes && includes.indexOf(accessor.name) > -1)
 			{
 				return false;
 			}
-			
+
 			if (excludes && excludes.indexOf(accessor.name) > -1)
 			{
 				return true;
 			}
 			
 			return false;
+		}
+		
+		public function writeUrlVariables(urlVariables:URLVariables, includes:Array, excludes:Array):void
+		{
+			
+		}
+		
+		public function toString():String
+		{
+			return "RestPropertyWriter[" + object.noun.singular + ", " + accessor.name + "]";
 		}
 	}
 }

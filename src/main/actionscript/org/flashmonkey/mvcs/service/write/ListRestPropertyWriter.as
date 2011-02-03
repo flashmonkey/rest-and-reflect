@@ -1,5 +1,7 @@
 package org.flashmonkey.mvcs.service.write
 {
+	import flash.net.URLVariables;
+	
 	import mx.collections.IList;
 	
 	import org.as3commons.reflect.Accessor;
@@ -7,41 +9,47 @@ package org.flashmonkey.mvcs.service.write
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.util.StringUtils;
 	
-	public class ListRestPropertyWriter extends AbstractRestPropertyWriter
+	public class ListRestPropertyWriter extends RestPropertyWriter
 	{
-		public function ListRestPropertyWriter(accessor:Accessor, object:IRestModel, verb:Verb, includes:Array, excludes:Array)
+		public function ListRestPropertyWriter(accessor:Accessor, object:IRestModel, verb:Verb)
 		{
-			super(accessor, object, verb, includes, excludes);
+			super(accessor, object, verb);
 		}
 		
-		public override function get json():String
-		{
-			if (_json) return _json;
-			
-			_json = '{"' + accessor.name '":[';
+		public override function writeJson(includes:Array, excludes:Array):String
+		{	
+			var json:String = '{"' + accessor.name + '_attributes":[';
 			
 			for each (var model:IRestModel in (accessor.getValue(object) as IList))
 			{
-				_json += model.toJson(verb, includes, excludes);
+				json += model.toJson(verb, includes, excludes);
 			}
 			
-			_json += ']}';
+			json += ']}';
 			
-			return _json;
+			return json;
 		}
 		
-		public override function get xml():XML
+		public override function writeXml(includes:Array, excludes:Array):XML
 		{
-			if (_xml) return _xml;
+			var xml:XML = <{accessor.name + "_attributes"}/>
 			
-			_xml = <{accessor.name}/>
-			
-			for each (var model:IRestModel in (accessor.getValue(object) as IList))
+			var list:IList = accessor.getValue(object) as IList
+
+			for each (var model:IRestModel in list)
 			{
-				_xml.appendChild(model.toXml(verb, includes, excludes));
+				xml.appendChild(model.toXml(verb, includes, excludes));
 			}
 			
-			return _xml;
+			return xml;
+		}
+		
+		public override function writeUrlVariables(urlVariables:URLVariables, includes:Array, excludes:Array):void
+		{
+			for each (var model:IRestModel in (accessor.getValue(object) as IList))
+			{
+				model.toUrlVariables(urlVariables, verb, includes, excludes);
+			}
 		}
 	}
 }

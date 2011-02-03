@@ -25,9 +25,9 @@ package org.flashmonkey.mvcs.service.rest
 			return Verb.PUT;
 		}
 		
-		public function UpdateOperation(service:IRestService, model:IRestModel, serviceContext:ServiceContext)
+		public function UpdateOperation(service:IRestService, model:IRestModel, writeContext:WriteContext)
 		{
-			super(service, model, serviceContext);
+			super(service, model, writeContext);
 		}
 	}
 }

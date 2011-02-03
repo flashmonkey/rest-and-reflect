@@ -1,29 +1,18 @@
 package org.flashmonkey.mvcs.service.write
 {
-	import flash.utils.describeType;
-	
 	import mx.collections.IList;
 	
 	import org.as3commons.collections.Map;
 	import org.as3commons.collections.framework.IMap;
-	import org.as3commons.reflect.Accessor;
 	import org.as3commons.reflect.Type;
-	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
-	import org.flashmonkey.mvcs.service.rest.ServiceContext;
+	import org.flashmonkey.mvcs.service.rest.WriteContext;
 	import org.flashmonkey.operations.service.IOperation;
-	import org.flashmonkey.util.StringUtils;
 	
 	public class AbstractJSONWriteOperation extends AbstractObjectWriteOperation
 	{
-		private var _includes:Array = [];
-		
-		private var _excludes:Array = ["prototype"];
-		
 		private var customFieldWritersMap:IMap = new Map();
-		
-		private var _serviceContext:ServiceContext;
 		
 		private var _writeName:Boolean;
 		
@@ -32,15 +21,11 @@ package org.flashmonkey.mvcs.service.write
 			customFieldWritersMap.add(key, handler);
 		}
 		
-		public function AbstractJSONWriteOperation(service:IRestService, source:*, verb:Verb, serviceContext:ServiceContext, writeName:Boolean)
+		public function AbstractJSONWriteOperation(service:IRestService, source:*, verb:Verb, writeContext:WriteContext, writeName:Boolean)
 		{
-			super(service, source, verb);
+			super(service, source, verb, writeContext);
 			
-			_serviceContext = serviceContext;
 			_writeName = writeName;
-			
-			_includes = _includes.concat(serviceContext.includes);
-			_excludes = _excludes.concat(serviceContext.excludes);
 		}
 		
 		/**
@@ -266,7 +251,7 @@ package org.flashmonkey.mvcs.service.write
 		protected function objectToString( o:Object, writeName:Boolean = true ):String
 		{
 			// create a string to store the object's jsonstring value
-			var s:String = "";
+			/*var s:String = "";
 			
 			var type:Type = Type.forInstance(o)
 			
@@ -274,7 +259,8 @@ package org.flashmonkey.mvcs.service.write
 			
 			s = "{" + s.substr(0, s.length - 1) + "}";
 			
-			return _writeName ? "{" + escapeString(StringUtils.capitalCaseToUnderscore(type.name)) + ":" + s + "}" : s;
+			return _writeName ? "{" + escapeString(StringUtils.capitalCaseToUnderscore(type.name)) + ":" + s + "}" : s;*/
+			return "";
 		}
 		
 		protected function writeModel(model:Object, type:Type, includes:Array, excludes:Array, writeName:Boolean = true):String 
@@ -296,7 +282,7 @@ package org.flashmonkey.mvcs.service.write
 		
 		protected function writeFields(model:Object, accessors:Array, s:String, includes:Array, excludes:Array, writeName:Boolean):String 
 		{
-			for each (var accessor:Accessor in accessors)
+			/*for each (var accessor:Accessor in accessors)
 			{	
 				if (accessor.isReadable())
 				{
@@ -330,7 +316,7 @@ package org.flashmonkey.mvcs.service.write
 					}
 				}
 			}
-			
+			*/
 			return s;
 		}
 		
@@ -361,10 +347,11 @@ package org.flashmonkey.mvcs.service.write
 		
 		protected function writeObject(value:*, writeName:Boolean = true):String
 		{
-			var op:IOperation = service.write(value, verb, _serviceContext, writeName);
+			/*var op:IOperation = service.write(value, verb, writeContext, writeName);
 			op.execute();
 			
-			return op.result as String;
+			return op.result as String;*/
+			return "";
 		}
 	}
 }

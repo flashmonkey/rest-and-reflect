@@ -9,7 +9,6 @@ package org.flashmonkey.mvcs.service.rest
 	import org.as3commons.reflect.MetaDataArgument;
 	import org.as3commons.reflect.Type;
 	import org.flashmonkey.mvcs.model.Format;
-	import org.flashmonkey.mvcs.model.IModel;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
@@ -18,11 +17,10 @@ package org.flashmonkey.mvcs.service.rest
 	import org.flashmonkey.mvcs.service.write.WriteJSONOperation;
 	import org.flashmonkey.mvcs.service.write.WriteXMLOperation;
 	import org.flashmonkey.operations.service.IOperation;
-	import org.osmf.layout.AbsoluteLayoutFacet;
 	
 	public class RestService implements IRestService
 	{
-		private var _context:String = "http://localhost:3000";
+		private var _context:String;
 		
 		public function get context():String
 		{
@@ -50,7 +48,7 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public function get format():Format
 		{
-			return _format;
+			return _format || (_format = Format.XML);
 		}
 		public function set format(value:Format):void
 		{
@@ -76,7 +74,7 @@ package org.flashmonkey.mvcs.service.rest
 			return null;
 		}
 		
-		public function create(value:IRestModel, serviceContext:ServiceContext = null):IOperation
+		public function create(value:IRestModel, writeContext:WriteContext = null):IOperation
 		{
 			var type:Type = Type.forInstance(value);
 			
@@ -98,18 +96,17 @@ package org.flashmonkey.mvcs.service.rest
 						dataField = "file";
 					}
 					
-					return new UploadOperation(this, value, a, dataField, serviceContext || new ServiceContext());
+					return new UploadOperation(this, value, a, dataField, writeContext || new WriteContext());
 				}
 				
 			}
 			
-			return new CreateOperation(this, value, serviceContext || new ServiceContext());
+			return new CreateOperation(this, value, writeContext || new WriteContext());
 		}
 		
-		public function update(value:IRestModel, serviceContext:ServiceContext = null):IOperation
+		public function update(value:IRestModel, writeContext:WriteContext = null):IOperation
 		{
-			trace("updating :" + serviceContext);
-			return new UpdateOperation(this, value, serviceContext || new ServiceContext());
+			return new UpdateOperation(this, value, writeContext || new WriteContext());
 		}
 		
 		public function destroy(value:IRestModel):IOperation
@@ -117,9 +114,9 @@ package org.flashmonkey.mvcs.service.rest
 			return new DestroyOperation(this, value);
 		}
 		
-		public function read(value:*, model:Class = null):IOperation
+		public function read(value:*, clazz:Class = null):IOperation
 		{
-			if (model)
+			/*if (model)
 			{
 				var type:Type = Type.forClass(model);
 				
@@ -146,12 +143,12 @@ package org.flashmonkey.mvcs.service.rest
 						}
 					}
 				}
-			}
+			}*/
 			
-			return format == Format.XML ? new ReadXMLOperation(new XML(value)) : new ReadJSONOperation(value as String);
+			return format == Format.XML ? new ReadXMLOperation(new XML(value)) : new ReadJSONOperation(value as String, clazz);
 		}
 		
-		public function write(value:*, verb:Verb, serviceContext:ServiceContext = null, writeName:Boolean = true):IOperation
+		public function write(value:*, verb:Verb, writeContext:WriteContext = null, writeName:Boolean = true):IOperation
 		{
 			/*var type:Type = Type.forInstance(value);
 			
@@ -179,7 +176,9 @@ package org.flashmonkey.mvcs.service.rest
 				}
 			}*/
 			trace("Writing format : " + format); 
-			return format == Format.XML ? new WriteXMLOperation(this, value, verb, serviceContext || new ServiceContext()) : new WriteJSONOperation(this, value, verb, serviceContext || new ServiceContext(), writeName);
+			writeContext = writeContext || new WriteContext();
+			
+			return format == Format.XML ? new WriteXMLOperation(this, value, verb, writeContext) : new WriteJSONOperation(this, value, verb, writeContext, writeName);
 		}
 	}
 }

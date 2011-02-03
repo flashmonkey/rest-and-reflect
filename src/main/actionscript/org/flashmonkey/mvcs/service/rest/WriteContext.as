@@ -1,6 +1,6 @@
 package org.flashmonkey.mvcs.service.rest
 {
-	public class ServiceContext
+	public class WriteContext
 	{
 		private var _includes:Array;
 		
@@ -16,7 +16,7 @@ package org.flashmonkey.mvcs.service.rest
 			return _excludes;
 		}
 		
-		public function ServiceContext(includes:Array = null, excludes:Array = null)
+		public function WriteContext(includes:Array = null, excludes:Array = null)
 		{
 			trace("creating context :" + includes + ":" + excludes);
 			

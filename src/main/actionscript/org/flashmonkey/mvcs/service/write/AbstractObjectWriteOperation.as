@@ -4,6 +4,7 @@ package org.flashmonkey.mvcs.service.write
 	import org.as3commons.reflect.MetaData;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
+	import org.flashmonkey.mvcs.service.rest.WriteContext;
 	import org.flashmonkey.operations.service.AbstractOperation;
 	
 	public class AbstractObjectWriteOperation extends AbstractOperation
@@ -29,57 +30,38 @@ package org.flashmonkey.mvcs.service.write
 			return _service;
 		}
 		
-		public function AbstractObjectWriteOperation(service:IRestService, source:*, verb:Verb)
+		private var _includes:Array = [];
+		
+		protected function get includes():Array
+		{
+			return _includes;
+		}
+		protected function set includes(value:Array):void 
+		{
+			_includes = value;
+		}
+		
+		private var _excludes:Array = ["prototype"];
+		
+		protected function get excludes():Array
+		{
+			return _excludes;
+		}
+		protected function set excludes(value:Array):void 
+		{
+			_excludes = value;
+		}
+		
+		public function AbstractObjectWriteOperation(service:IRestService, source:*, verb:Verb, writeContext:WriteContext)
 		{
 			super();
 			
+			_service = service;
 			_source = source;
 			_verb = verb;
-			_service = service;
-		}
-		
-		protected function ignoreField(accessor:Accessor, includes:Array, excludes:Array):Boolean
-		{
-			if (includes.indexOf(accessor.name) > -1)
-			{
-				return false;
-			}
 			
-			if (excludes.indexOf(accessor.name) > -1)
-			{
-				return true;
-			}
-			
-			if (accessor.hasMetaData("Upload"))
-			{
-				return true;
-			}
-			
-			if (accessor.hasMetaData("Ignore"))//
-			{
-				if (includes && includes.indexOf(accessor.name) > -1)
-				{
-					return false;
-				}
-				
-				var m:MetaData = MetaData(accessor.getMetaData("Ignore")[0]);
-				
-				if (m.hasArgumentWithKey("only"))
-				{
-					//trace("does the verb match? " + m.getArgument("only").value + " " + _verb.toString() + " " + + m.getArgument("only").value.split(",").indexOf(_verb.toString()));
-					if (m.getArgument("only").value.split(",").indexOf(_verb.toString()) > -1)
-					{
-						return true;
-					}
-				}
-				else
-				{
-					return true;
-				}
-				
-			}
-			
-			return false;
+			this.includes = this.includes.concat(writeContext.includes);
+			this.excludes = this.excludes.concat(writeContext.excludes);
 		}
 	}
 }

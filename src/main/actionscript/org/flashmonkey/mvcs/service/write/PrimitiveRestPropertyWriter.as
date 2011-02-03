@@ -1,23 +1,31 @@
 package org.flashmonkey.mvcs.service.write
 {
+	import flash.net.URLVariables;
+	
 	import org.as3commons.reflect.Accessor;
 	import org.flashmonkey.mvcs.model.IRestModel;
+	import org.flashmonkey.mvcs.model.Verb;
 
-	public class PrimitiveRestPropertyWriter extends AbstractRestPropertyWriter
+	public class PrimitiveRestPropertyWriter extends RestPropertyWriter
 	{
-		public function PrimitiveRestPropertyWriter(accessor:Accessor, object:IRestModel, verb:Verb, includes:Array, excludes:Array)
+		public function PrimitiveRestPropertyWriter(accessor:Accessor, object:IRestModel, verb:Verb)
 		{
-			super(accessor, object, verb, includes, excludes);
+			super(accessor, object, verb);
 		}
 		
-		public override function get json():String
+		public override function writeJson(includes:Array, excludes:Array):String
 		{
-			return '{"' + accessor.name + '":"' + accessor.getValue(object).toString() + '"}';
+			return '"' + accessor.name + '":"' + accessor.getValue(object).toString() + '"';
 		}
 		
-		public override function get xml():XML
+		public override function writeXml(includes:Array, excludes:Array):XML
 		{
 			return <{accessor.name}>{accessor.getValue(object).toString()}</{accessor.name}>;
+		}
+		
+		public override function writeUrlVariables(urlVariables:URLVariables, includes:Array, excludes:Array):void
+		{
+			urlVariables[accessor.name] = accessor.getValue(object).toString();
 		}
 	}
 }

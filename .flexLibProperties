@@ -32,9 +32,9 @@
     <classEntry path="org.flashmonkey.mvcs.view.RestMediator"/>
     <classEntry path="org.flashmonkey.util.StringUtils"/>
     <classEntry path="org.flashmonkey.mvcs.service.write.WriteToXMLOperationTest"/>
-    <classEntry path="org.flashmonkey.mvcs.service.rest.ServiceContext"/>
     <classEntry path="org.flashmonkey.mvcs.service.write.IRestPropertyWriter"/>
     <classEntry path="org.flashmonkey.mvcs.service.write.ListRestPropertyWriter"/>
+    <classEntry path="org.flashmonkey.mvcs.service.write.ObjectRestPropertyWriter"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

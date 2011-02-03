@@ -7,25 +7,31 @@ package org.flashmonkey.mvcs.service.write
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
-	import org.flashmonkey.mvcs.service.rest.ServiceContext;
+	import org.flashmonkey.mvcs.service.rest.WriteContext;
 	
 	public class WriteXMLOperation extends AbstractObjectWriteOperation
 	{
-		private var _includes:Array = [];
-		
-		private var _excludes:Array = ["prototype"];
-		
-		public function WriteXMLOperation(service:IRestService, source:*, verb:Verb, serviceContext:ServiceContext)
+		public function WriteXMLOperation(service:IRestService, source:*, verb:Verb, writeContext:WriteContext)
 		{
-			super(service, source, verb);
-	
-			_includes = _includes.concat(serviceContext.includes);
-			_excludes = _excludes.concat(serviceContext.excludes);
+			super(service, source, verb, writeContext);		
 		}
 		
 		public override function execute():void
 		{
-			var type:Type;
+			var result:*;
+			
+			if (source is IList)
+			{
+				
+			}
+			else if (source is IRestModel)
+			{
+				dispatchComplete( (source as IRestModel).toXml(verb, includes, excludes) );
+			}
+			
+			
+			
+			/*var type:Type;
 			
 			if (source is IList)
 			{
@@ -45,13 +51,13 @@ package org.flashmonkey.mvcs.service.write
 			{
 				type = Type.forInstance(source);
 				dispatchComplete(writeModel(IRestModel(source), type, _includes, _excludes));
-			}
+			}*/
 		}
 		
-		protected function writeModel(model:IRestModel, type:Type, includes:Array = null, excludes:Array = null):XML 
+		/*protected function writeModel(model:IRestModel, type:Type, includes:Array = null, excludes:Array = null):XML 
 		{
 			trace("writing model " + model + " excluding " + excludes);
-			var xml:XML = <{model.noun.singular}/>
+			var xml:XML = <{model.noun.singular}/>*/
 
 			/*for each (var extendedClass:String in type.extendsClasses)
 			{
@@ -73,7 +79,7 @@ package org.flashmonkey.mvcs.service.write
 			}
 			trace("class " + type.name + " has " + Type.forName(extendedClass).accessors.length + " fields " + a);*/
 			
-			writeFields(model, type.accessors, xml, includes, excludes);
+			/*writeFields(model, type.accessors, xml, includes, excludes);
 			trace(xml);
 			return xml;
 		}
@@ -128,6 +134,6 @@ package org.flashmonkey.mvcs.service.write
 			}
 			
 			xml.appendChild(listXML);
-		}
+		}*/
 	}
 }

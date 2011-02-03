@@ -10,9 +10,9 @@ package org.flashmonkey.mvcs.service.rest
 			return context + "/" + model.noun + "/" + model._id + ".xml";
 		}
 		
-		public function ShowOperation(service:IRestService, model:IRestModel, serviceContext:ServiceContext)
+		public function ShowOperation(service:IRestService, model:IRestModel, writeContext:WriteContext)
 		{
-			super(service, model, serviceContext);
+			super(service, model, writeContext);
 		}
 	}
 }

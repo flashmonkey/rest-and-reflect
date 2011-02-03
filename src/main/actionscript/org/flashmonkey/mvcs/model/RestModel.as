@@ -1,12 +1,14 @@
 package org.flashmonkey.mvcs.model
 {
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
+	import flash.net.URLVariables;
+	
+	import mx.collections.ArrayCollection;
 	
 	import org.as3commons.collections.Map;
 	import org.as3commons.collections.framework.IMap;
 	import org.as3commons.lang.ClassUtils;
 	import org.as3commons.reflect.Accessor;
+	import org.as3commons.reflect.MetaData;
 	import org.as3commons.reflect.Type;
 	import org.flashmonkey.mvcs.service.write.IRestPropertyWriter;
 	import org.flashmonkey.mvcs.service.write.RestPropertyWriter;
@@ -29,9 +31,24 @@ package org.flashmonkey.mvcs.model
 		
 		private static var _types:Map = new Map();
 		
+		private static function TYPE(clazz:Class):Type
+		{
+			if (!_types.hasKey(clazz))
+			{
+				_types.add(clazz, Type.forClass(clazz));
+			}
+			
+			return _types.itemFor(clazz) as Type;
+		}
+		
 		public static function forName(name:String):IRestModel
 		{
 			return Noun.newInstance(name);
+		}
+		
+		protected function get cacheProperties():Boolean
+		{
+			return false;
 		}
 		
 		private var _noun:Noun;
@@ -86,35 +103,52 @@ package org.flashmonkey.mvcs.model
 		/**
 		 * @inheritDoc
 		 */
-		public function toJson(verb:Verb, includes:Array = null, excludes:Array = null):String
+		public function toJson(verb:Verb, includes:Array, excludes:Array):String
 		{
-			var s:String = '{';
+			var properties:Array = serialisedProperties(verb, includes, excludes);
 			
-			for each (var propertyWriter:IRestPropertyWriter in serialisedProperties(verb, includes, excludes))
+			var props:Array = []
+			
+			for each (var propertyWriter:IRestPropertyWriter in properties)
 			{
-				if (propertyWriter.can) s += propertyWriter.json;
+				if (propertyWriter.canWrite(includes, excludes)) 
+				{
+					var s:String = propertyWriter.writeJson(includes, excludes);
+
+					props.push(s);
+				}
 			}
 			
-			s += '}';
+			return '{' + props.join(',') + '}';
 		}
 		
-		public function fromJson(value:String):void
+		public function fromJson(value:Object):void
 		{
-			
+			for (var i:String in value)
+			{
+				applyProperty(i, value[i]);
+			}
+		}
+		
+		protected function applyProperty(key:String, value:*):void 
+		{
+			this[key] = value;
 		}
 		
 		/**
 		 * @inheritDoc
 		 */
-		public function toXml(verb:Verb, includes:Array = null, excludes:Array = null):XML
+		public function toXml(verb:Verb, includes:Array, excludes:Array):XML
 		{
 			var xml:XML = <{noun.singular}/>
 			
-			for each (var propertyWriter:IRestPropertyWriter in serialisedProperties(verb, includes, excludes))
+			var properties:Array = serialisedProperties(verb, includes, excludes);
+
+			for each (var propertyWriter:IRestPropertyWriter in properties)
 			{
-				if (propertyWriter.can) s += propertyWriter.xml;
+				if (propertyWriter.canWrite(includes, excludes)) xml.appendChild(propertyWriter.writeXml(includes, excludes));
 			}
-			
+
 			return xml;
 		}
 		public function fromXml(value:XML):void
@@ -122,42 +156,76 @@ package org.flashmonkey.mvcs.model
 			
 		}
 		
-		private function serialisedProperties(verb:Verb, includes:Array, excludes:Array):Array
+		public function toUrlVariables(urlVariables:URLVariables, verb:Verb, includes:Array, excludes:Array):void
 		{
-			// Get the list of properties that should be serialised
-			// for the given Verb (again, done lazily).
-			if (!_serialisedProperties.hasKey(verb))
+			for each (var propertyWriter:IRestPropertyWriter in serialisedProperties(verb, includes, excludes))
+			{
+				if (propertyWriter.canWrite(includes, excludes)) propertyWriter.writeUrlVariables(urlVariables, includes, excludes);
+			}
+		}
+		public function fromURLVariables(value:String):void
+		{
+		
+		}
+		
+		protected function serialisedProperties(verb:Verb, includes:Array, excludes:Array):Array
+		{
+			if (cacheProperties)
 			{
 				// Store the Type for the current instance into the _types
 				// property - done lazily when toJson() is first called.
-				if (!_types.hasKey(clazz))
+				if (!_serialisedProperties.hasKey(clazz))
 				{
-					_types.add(clazz, Type.forInstance(this));
+					_serialisedProperties.add(clazz, new Map());
 				}
 				
-				var type:Type = _types.itemFor(clazz) as Type;
-				
-				// Iterate over the accessors stored in the Type.
-				// If we're not ignoring them then they're added to the 
-				// list of properties to serialise.
-				var props:Array = [];
-				
-				for each (var accessor:Accessor in type.accessors)
+				var propertiesMap:IMap = _serialisedProperties.itemFor(clazz) as IMap;
+					
+				// Get the list of properties that should be serialised
+				// for the given Verb (again, done lazily).
+				if (!propertiesMap.hasKey(verb))
 				{
-					if (!ignoreField(accessor, includes, excludes))
-					{
-						props.push(RestPropertyWriter.writerFor(accessor, this, verb, includes, excludes);
-					}
+					propertiesMap.add(verb, createWritersArray(TYPE(clazz), verb, includes, excludes));
 				}
 				
-				_types.add(verb, props);
+				return propertiesMap.itemFor(verb) as Array;
 			}
-			
-			return _types.itemFor(verb) as Array;
+			else
+			{
+				return createWritersArray(TYPE(clazz), verb, includes, excludes);
+			}
 		}
 		
-		private function ignoreField(accessor:Accessor, includes:Array, excludes:Array):Boolean
+		private function createWritersArray(type:Type, verb:Verb, includes:Array, excludes:Array):Array
 		{
+			// Iterate over the accessors stored in the Type.
+			// If we're not ignoring them then they're added to the 
+			// list of properties to serialise.
+			var props:Array = [];
+			
+			for each (var accessor:Accessor in type.accessors)
+			{
+				if (!ignoreField(accessor, verb, includes, excludes))
+				{
+					props.push(RestPropertyWriter.writerFor(accessor, this, verb));
+				}
+			}
+			
+			return props;
+		}
+		
+		private function ignoreField(accessor:Accessor, verb:Verb, includes:Array, excludes:Array):Boolean
+		{
+			if (includes && includes.indexOf(accessor.name) > -1)
+			{
+				return false;
+			}
+			
+			if (excludes && excludes.indexOf(accessor.name) > -1)
+			{
+				return true;
+			}
+			
 			if (accessor.hasMetaData("Upload"))
 			{
 				return true;
@@ -165,16 +233,11 @@ package org.flashmonkey.mvcs.model
 			
 			if (accessor.hasMetaData("Ignore"))
 			{
-				if (includes && includes.indexOf(accessor.name) > -1)
-				{
-					return false;
-				}
-				
 				var m:MetaData = MetaData(accessor.getMetaData("Ignore")[0]);
 				
 				if (m.hasArgumentWithKey("only"))
 				{
-					if (m.getArgument("only").value.split(",").indexOf(_verb.toString()) > -1)
+					if (m.getArgument("only").value.split(",").indexOf(verb.toString()) > -1)
 					{
 						return true;
 					}
