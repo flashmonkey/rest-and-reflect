@@ -15,7 +15,7 @@ package org.flashmonkey.mvcs.service.write
 		
 		public override function writeJson(includes:Array, excludes:Array):String
 		{
-			trace("trying to transform " + accessor.getValue(object) + " to a json string");
+			trace("trying to transform " + accessor.name + " " + accessor.getValue(object) + " to a json string");
 			return '{"' + accessor.name + '":' + (accessor.getValue(object) as IRestModel).toJson(verb, includes, excludes) + '}';
 		}
 		

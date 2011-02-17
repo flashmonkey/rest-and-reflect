@@ -11,6 +11,7 @@ package org.flashmonkey.mvcs.service.rest
 	import org.flashmonkey.mvcs.model.Verb;
 	import org.flashmonkey.mvcs.service.IRestService;
 	import org.flashmonkey.operations.service.AbstractOperation;
+	import org.flashmonkey.util.StringUtils;
 	
 	public class RestOperation extends AbstractOperation
 	{		
@@ -49,7 +50,7 @@ package org.flashmonkey.mvcs.service.rest
 		{
 			if (!_request)
 			{
-				_request = new URLRequest(url);
+				_request = new URLRequest(url + "?" + StringUtils.generateRandomString(10));
 				_request.method = verb.toString();
 				_request.contentType = contentType;
 			}

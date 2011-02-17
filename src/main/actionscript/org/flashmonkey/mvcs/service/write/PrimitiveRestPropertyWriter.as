@@ -20,7 +20,14 @@ package org.flashmonkey.mvcs.service.write
 		
 		public override function writeXml(includes:Array, excludes:Array):XML
 		{
-			return <{accessor.name}>{accessor.getValue(object).toString()}</{accessor.name}>;
+			var value:Object = accessor.getValue(object);
+			
+			if (value)
+			{
+				return <{accessor.name}>{value.toString()}</{accessor.name}>;
+			}
+			
+			return null;
 		}
 		
 		public override function writeUrlVariables(urlVariables:URLVariables, includes:Array, excludes:Array):void

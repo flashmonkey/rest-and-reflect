@@ -20,24 +20,36 @@ package org.flashmonkey.mvcs.service.write
 			if (source is IList)
 			{
 				var list:IList = source as IList;
-				var model:IRestModel = list.getItemAt(0) as IRestModel;
 				
-				var s:String = '';//'{"' + model.noun.plural + '":["';
-				
-				for each (var model:IRestModel in list)
+				if (list.length > 0)
 				{
-					s += model.toJson(verb, includes, excludes);
+					var items:Array = [];	
+					
+					for each (var model:IRestModel in list)
+					{
+						items.push(model.toJson(verb, includes, excludes));
+					}
+					
+					var s:String = items.join(",");
+					
+					trace("LIST STRING +++++++++++++++++++++++++++++++\n" + s);
+					
+					dispatchComplete( s );
 				}
-				
-				s += '';//']}';
-				
-				dispatchComplete( s );
+				else
+				{
+					dispatchComplete();
+				}
 			}
 			else if (source is IRestModel)
 			{
 				var m:IRestModel = source as IRestModel;
 				
-				dispatchComplete( '{"' + m.noun.singular + '":' + m.toJson(verb, includes, excludes) + '}' );
+				var s:String = '{"' + m.noun.singular + '":' + m.toJson(verb, includes, excludes) + '}';
+				
+				trace("WRITING JSON FOR " + m.noun.singular + " " + s);
+				
+				dispatchComplete( s );
 			}
 		}
 	}

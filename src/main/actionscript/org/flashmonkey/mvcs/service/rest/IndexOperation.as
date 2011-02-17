@@ -8,7 +8,6 @@ package org.flashmonkey.mvcs.service.rest
 		
 		public override function get url():String
 		{
-			trace("URL: " + service.format);
 			return context + "/" + _url + service.format.toString();
 		}
 		

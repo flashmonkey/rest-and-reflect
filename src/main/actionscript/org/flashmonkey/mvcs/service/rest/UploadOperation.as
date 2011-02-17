@@ -86,6 +86,8 @@ package org.flashmonkey.mvcs.service.rest
 		
 		private function get file():FileReference
 		{
+			trace("UPLOAD FIELD: " + _uploadField.getValue(model));
+			
 			return FileReference(_uploadField.getValue(model));
 		}
 	}

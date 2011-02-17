@@ -26,7 +26,11 @@ package org.flashmonkey.mvcs.service.write
 			}
 			else if (source is IRestModel)
 			{
-				dispatchComplete( (source as IRestModel).toXml(verb, includes, excludes) );
+				var xml:XML = (source as IRestModel).toXml(verb, includes, excludes);
+				
+				trace("XML: " + xml.toXMLString());
+				
+				dispatchComplete( xml );
 			}
 			
 			

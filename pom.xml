@@ -7,7 +7,7 @@
 
 	<groupId>org.flashmonkey</groupId>
 	<artifactId>rest-and-reflect</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 	<packaging>swc</packaging>
 	<name>Rest And Reflect</name>
 
@@ -125,6 +125,19 @@
 			</releases>
 		</pluginRepository>
 	</pluginRepositories>
+	
+	<distributionManagement>
+		<repository>
+			<id>internal.repo</id>
+			<name>Quick TV Internal Releases Repository</name>
+			<url>http://50.16.234.58:8081/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>internal.repo.snapshot</id>
+			<name>Quick TV Internal Snapshots Repository</name>
+			<url>http://50.16.234.58:8081/nexus/content/repositories/snaphots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<dependencies>
 

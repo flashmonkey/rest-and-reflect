@@ -32,16 +32,21 @@ package org.flashmonkey.mvcs.service.write
 		
 		public override function writeXml(includes:Array, excludes:Array):XML
 		{
-			var xml:XML = <{accessor.name + "_attributes"}/>
-			
 			var list:IList = accessor.getValue(object) as IList
-
-			for each (var model:IRestModel in list)
+			
+			if (list && list.length > 0)
 			{
-				xml.appendChild(model.toXml(verb, includes, excludes));
+				var xml:XML = <{accessor.name + "_attributes"}/>
+				
+				for each (var model:IRestModel in list)
+				{
+					xml.appendChild(model.toXml(verb, includes, excludes));
+				}
+				
+				return xml;
 			}
 			
-			return xml;
+			return null;
 		}
 		
 		public override function writeUrlVariables(urlVariables:URLVariables, includes:Array, excludes:Array):void

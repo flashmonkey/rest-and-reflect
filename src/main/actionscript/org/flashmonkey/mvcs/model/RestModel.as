@@ -3,8 +3,10 @@ package org.flashmonkey.mvcs.model
 	import flash.net.URLVariables;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
 	
 	import org.as3commons.collections.Map;
+	import org.as3commons.collections.framework.IIterator;
 	import org.as3commons.collections.framework.IMap;
 	import org.as3commons.lang.ClassUtils;
 	import org.as3commons.reflect.Accessor;
@@ -25,6 +27,26 @@ package org.flashmonkey.mvcs.model
 			}
 			
 			throw new Error("There is no RestModel instance with the id '" + id + "'");
+		}
+		
+		public static function forType(clazz:Class):IList
+		{
+			var list:ArrayCollection = new ArrayCollection();
+				
+			var iterator:IIterator = _map.iterator();
+			var item:*;
+			
+			while (iterator.hasNext())
+			{
+				item = iterator.next();
+	
+				if (item is clazz)
+				{
+					list.addItem(item);
+				}
+			}
+			
+			return list;
 		}
 		
 		private static var _serialisedProperties:Map = new Map();
@@ -132,7 +154,14 @@ package org.flashmonkey.mvcs.model
 		
 		protected function applyProperty(key:String, value:*):void 
 		{
-			this[key] = value;
+			try
+			{
+				this[key] = value;
+			}
+			catch (e:Error)
+			{
+				trace("Cannot create property '" + key + "' on " + ClassUtils.getFullyQualifiedName(ClassUtils.forInstance(this), true));
+			}
 		}
 		
 		/**
@@ -146,7 +175,12 @@ package org.flashmonkey.mvcs.model
 
 			for each (var propertyWriter:IRestPropertyWriter in properties)
 			{
-				if (propertyWriter.canWrite(includes, excludes)) xml.appendChild(propertyWriter.writeXml(includes, excludes));
+				var writtenProperty:XML = propertyWriter.writeXml(includes, excludes)
+					
+				if (writtenProperty && propertyWriter.canWrite(includes, excludes)) 
+				{
+					xml.appendChild(writtenProperty);
+				}
 			}
 
 			return xml;

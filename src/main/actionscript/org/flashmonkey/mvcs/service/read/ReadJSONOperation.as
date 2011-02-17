@@ -6,6 +6,7 @@ package org.flashmonkey.mvcs.service.read
 	
 	import org.as3commons.lang.ClassUtils;
 	import org.as3commons.lang.ObjectUtils;
+	import org.as3commons.reflect.Type;
 	import org.flashmonkey.mvcs.model.IRestModel;
 	import org.flashmonkey.operations.service.AbstractOperation;
 	
@@ -25,8 +26,15 @@ package org.flashmonkey.mvcs.service.read
 		
 		public override function execute():void
 		{
-			trace("There are " + ObjectUtils.getNumProperties(_source) + " properties on the source object " + (_source is Array));
+			trace("There are " + ObjectUtils.getNumProperties(_source) + " properties on the source object " + (_source is Array) + " " + ClassUtils.getFullyQualifiedName(_clazz, true));
 			
+			trace("PROPERTIES: " + ObjectUtils.getKeys(_source));
+			
+			if (_clazz)
+			{
+				trace(ClassUtils.getFullyQualifiedName(_clazz) + " extends " + Type.forClass(_clazz).extendsClasses);
+			}
+					
 			if (_source is Array)
 			{
 				var items:Array = [];
@@ -45,7 +53,10 @@ package org.flashmonkey.mvcs.service.read
 			}
 			else
 			{
+				var obj:IRestModel = ClassUtils.newInstance(_clazz) as IRestModel;
+				obj.fromJson(_source);
 				
+				dispatchComplete(obj);
 			}
 		}
 	}
